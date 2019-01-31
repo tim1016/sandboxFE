@@ -1,19 +1,32 @@
-var gulp = require('gulp'),
-postcss = require('gulp-postcss'),
-autoprefixer = require('autoprefixer'),
-cssvars = require('postcss-simple-vars'),
-nested = require('postcss-nested'),
-cssImport = require('postcss-import'),
-mixins = require('postcss-mixins'),
-hexrgba = require('postcss-hexrgba');    
+var gulp = require("gulp"),
+    sass = require("gulp-sass"),
+    postcss = require("gulp-postcss"),
+    autoprefixer = require("autoprefixer"),
+    cssnano = require("gulp-cssnano"),
+	sourcemaps = require("gulp-sourcemaps"),
+	postcss = require('gulp-postcss'),
+	browserSync  = require( 'browser-sync' ).create();
 
-gulp.task('styles', function() {
-  return gulp.src('./app/assets/styles/styles.css')
-    .pipe(postcss([cssImport, mixins, cssvars, nested, hexrgba, autoprefixer]))
-    .on('error', function(errorInfo){
-      console.log(errorInfo.toString());
-      this.emit('end');})
-    .pipe(gulp.dest('./app/temp/styles'));
+const stylesFrontEnd = "./app/assets/styles/styles.scss";
+const styleURL = "./app/temp/styles";
+
+
+
+
+
+
+gulp.task( 'styles', function() {
+	gulp.src( [stylesFrontEnd] )
+		.pipe( sourcemaps.init() )
+		.pipe(sass())
+		.pipe( sass({
+			errLogToConsole: true,
+			outputStyle: 'compressed'
+		}))
+		.on( 'error', console.error.bind( console ) )
+		.pipe(postcss([autoprefixer]))
+		.pipe(cssnano())
+		.pipe( sourcemaps.write('./') )
+		.pipe( gulp.dest( styleURL ) )
+		.pipe( browserSync.stream() );
 });
-
-
